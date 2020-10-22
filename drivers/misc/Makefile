@@ -96,3 +96,4 @@ obj-$(CONFIG_AW8624_HAPTIC) += aw8624_haptic/
 obj-$(CONFIG_DRV2624_HAPTIC) += drv2624_haptic/
 obj-$(CONFIG_LDO_WL2866D)     += wl2866d.o
 obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
+obj-$(CONFIG_MACH_XIAOMI_F9S) += hardware_info.o
