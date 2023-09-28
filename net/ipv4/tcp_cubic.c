@@ -393,7 +393,7 @@ static void hystart_update(struct sock *sk, u32 delay)
 		u32 now = bictcp_clock_us(sk);
 
 		/* first detection parameter - ack-train detection */
-		if ((s32)(now - ca->last_ack) <= hystart_ack_delta_us) {
+		if ((s32)(now - ca->last_ack) <= (hystart_ack_delta * 1000)) {
 			ca->last_ack = now;
 
 			threshold = ca->delay_min + hystart_ack_delay(sk);
@@ -426,9 +426,6 @@ static void hystart_update(struct sock *sk, u32 delay)
 		if (ca->curr_rtt > delay)
 			ca->curr_rtt = delay;
 		if (ca->sample_cnt < HYSTART_MIN_SAMPLES) {
-			if (ca->curr_rtt > delay)
-				ca->curr_rtt = delay;
-
 			ca->sample_cnt++;
 		} else {
 			if (ca->curr_rtt > ca->delay_min +
@@ -445,7 +442,7 @@ static void hystart_update(struct sock *sk, u32 delay)
 	}
 }
 
-static void cubictcp_acked(struct sock *sk, const struct ack_sample *sample)
+static void bictcp_acked(struct sock *sk, const struct ack_sample *sample)
 {
 	const struct tcp_sock *tp = tcp_sk(sk);
 	struct bictcp *ca = inet_csk_ca(sk);
