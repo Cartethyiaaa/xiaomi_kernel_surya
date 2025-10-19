@@ -1,10 +1,9 @@
 #!/bin/bash
 #
-# Compile script for FSociety kernel
-# Copyright (C) 2020-2021 Adithya R.
+# Compile script for Lucifer kernel
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="FSociety-surya-$(date '+%Y%m%d-%H%M').zip"
+ZIPNAME="Lucifer-surya-$(date '+%Y%m%d-%H%M').zip"
 TC_DIR="$(pwd)/tc/clang-20"
 AK3_DIR="$(pwd)/android/AnyKernel3"
 DEFCONFIG="surya_defconfig"
@@ -24,14 +23,11 @@ sync_repo() {
 
     if [ -d "$dir" ]; then
         if $update; then
-			# Fetch the latest changes
             git -C "$dir" fetch origin --quiet
 
-            # Compare local and remote commits
             LOCAL_COMMIT=$(git -C "$dir" rev-parse HEAD)
             REMOTE_COMMIT=$(git -C "$dir" rev-parse "origin/$branch")
 
-            # If there are changes, reset and log the update
             if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
                 git -C "$dir" reset --quiet --hard "origin/$branch"
                 LATEST_COMMIT=$(git -C "$dir" log -1 --oneline)
@@ -41,7 +37,6 @@ sync_repo() {
             fi
         fi
     else
-        # Clone the repository if it doesn't exist
         echo "Cloning $repo_url to $dir..."
         if ! git clone --quiet --depth=1 -b "$branch" "$repo_url" "$dir"; then
             echo "Cloning failed! Aborting..."
@@ -88,7 +83,7 @@ for arg in "$@"; do
 			;;
 		-s|--su)
 			ENABLE_KSU=true
-			ZIPNAME="${ZIPNAME/FSociety-surya/FSociety-KSU}"
+			ZIPNAME="${ZIPNAME/Lucifer-surya/Lucifer-KSU}"
 			;;
 		*)
 			echo "Unknown argument: $arg"
@@ -134,6 +129,26 @@ if [ -f "$kernel" ] && [ -f "$dtb" ] && [ -f "$dtbo" ]; then
 	rm -rf AnyKernel3
 	echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
 	echo "Zip: $ZIPNAME"
+
+	echo -e "\nUploading to GoFile.io...\n"
+	if [ -f "$ZIPNAME" ]; then
+		SERVER=$(curl -s https://api.gofile.io/getServer | grep -o '"server":"[^"]*' | cut -d'"' -f4)
+		if [ -n "$SERVER" ]; then
+			RESP=$(curl -s -F "file=@${ZIPNAME}" "https://${SERVER}.gofile.io/uploadFile")
+			LINK=$(echo "$RESP" | grep -o '"downloadPage":"[^"]*' | cut -d'"' -f4)
+			if [ -n "$LINK" ]; then
+				echo -e "Upload successful!"
+				echo "📦 Download link: $LINK"
+			else
+				echo -e "Upload failed to parse response!"
+				echo "Response: $RESP"
+			fi
+		else
+			echo "Failed to get GoFile server!"
+		fi
+	else
+		echo "File not found: $ZIPNAME"
+	fi
 else
 	echo -e "\nCompilation failed!"
 	exit 1
