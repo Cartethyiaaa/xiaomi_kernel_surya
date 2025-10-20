@@ -21,12 +21,8 @@ jobs:
           command: curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
 
       - run:
-          name: Permission build.sh
-          command: chmod +x build.sh
-
-      - run:
           name: Run build script
-          command: ./build.sh
+          command: source build.sh --su
 
 workflows:
   version: 2

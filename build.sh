@@ -1,13 +1,13 @@
 #!/bin/bash
 #
 # Compile script for Lucifer kernel
-# Copyright (C) 2020-2021 Adithya R.
+# Mahirooo | HiraTeam.
 
 SECONDS=0 # builtin bash timer
-LOCAL_DIR=$(pwd)
 ZIPNAME="Lucifer-surya-$(date '+%Y%m%d-%H%M').zip"
-TC_DIR="$LOCAL_DIR/tc/clang-20"
-AK3_DIR="$LOCAL_DIR/android/AnyKernel3"
+LOCAL_DIR="$(pwd)"
+TC_DIR="$(pwd)/tc/clang-20"
+AK3_DIR="$(pwd)/android/AnyKernel3"
 DEFCONFIG="surya_defconfig"
 
 if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
@@ -52,11 +52,6 @@ if [[ $1 = "-u" || $1 = "--update" ]]; then
 	exit
 else
     sync_repo $TC_DIR "https://bitbucket.org/rdxzv/clang-standalone.git" "20" false
-fi
-
-if [ ! -d "$TC_DIR" ]; then
-    echo "Error: Clang directory missing. Aborting build process."
-    exit 1
 fi
 
 if [[ $1 = "-r" || $1 = "--regen" ]]; then
@@ -112,28 +107,24 @@ if $ENABLE_KSU; then
 else
 	make $DEFCONFIG
 fi
-make -j$(nproc --all) LLVM=1 Image.gz-dtb dtb.img dtbo.img 2> >(tee log.txt >&2) || exit $?
+make -j$(nproc --all) LLVM=1 Image.gz dtb.img dtbo.img 2> >(tee log.txt >&2) || exit $?
 
-kernel="out/arch/arm64/boot/Image.gz-dtb"
-dtb="out/arch/arm64/boot/dtb.img"
-dtbo="out/arch/arm64/boot/dtbo.img"
-
-if [ -f "$kernel" ] && [ -f "$dtb" ] && [ -f "$dtbo" ]; then
+if [ -f "out/arch/arm64/boot/Image.gz" ] && [ -f "out/arch/arm64/boot/dtbo.img" ]; then
 echo -e "\nKernel compiled succesfully! Zipping up...\n"
 if [ -d "$AK3_DIR" ]; then
 cp -r $AK3_DIR AnyKernel3
-elif ! git clone -q https://github.com/ardia-kun/AnyKernel3; then
+elif ! git clone -q https://github.com/rd-stuffs/AnyKernel3.git; then
 echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
 exit 1
 fi
-cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3
+cp out/arch/arm64/boot/Image.gz AnyKernel3
 cp out/arch/arm64/boot/dtbo.img AnyKernel3
 cp out/arch/arm64/boot/dtb.img AnyKernel3
 
 rm -f *zip
 cd AnyKernel3
-git checkout main &> /dev/null
-zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder
+git checkout FSociety &> /dev/null
+zip -r9 "../$ZIPNAME" * -x .git modules\* patch\* ramdisk\* README.md *placeholder
 fi
 cd ..
 rm -rf AnyKernel3
@@ -144,10 +135,8 @@ echo -e "======================================="
 echo -e "Completed in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
 echo "Zip: $ZIPNAME"
 echo "Move Zip into Home Directory"
-mv *.zip ${LOCAL_DIR}
 echo "Upload Zip to Pixeldrain"
-curl -T ${LOCAL_DIR}/*.zip -u :5f45f184-64bb-4eaa-be19-4a5f0459db49 https://pixeldrain.com/api/file/
+curl -T ${LOCAL_DIR}/*.zip -u :bb2513da-caec-4d8c-9b95-84f05c8dd743 https://pixeldrain.com/api/file/
 echo "Remove The Zip File"
-rm -rf ${LOCAL_DIR}/*.zip
 echo "DONE ALL"
 echo -e "======================================="
