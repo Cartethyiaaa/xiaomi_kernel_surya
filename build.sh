@@ -4,9 +4,10 @@
 # Copyright (C) 2020-2021 Adithya R.
 
 SECONDS=0 # builtin bash timer
+LOCAL_DIR=$(pwd)
 ZIPNAME="Lucifer-surya-$(date '+%Y%m%d-%H%M').zip"
-TC_DIR="$(pwd)/tc/clang-20"
-AK3_DIR="$(pwd)/android/AnyKernel3"
+TC_DIR="$LOCAL_DIR/tc/clang-20"
+AK3_DIR="$LOCAL_DIR/android/AnyKernel3"
 DEFCONFIG="surya_defconfig"
 
 if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
@@ -47,16 +48,14 @@ sync_repo() {
 }
 
 if [[ $1 = "-u" || $1 = "--update" ]]; then
-    sync_repo $AK3_DIR "https://github.com/rd-stuffs/AnyKernel3.git" "FSociety" true
     sync_repo $TC_DIR "https://bitbucket.org/rdxzv/clang-standalone.git" "20" true
 	exit
 else
-    sync_repo $AK3_DIR "https://github.com/rd-stuffs/AnyKernel3.git" "FSociety" false
     sync_repo $TC_DIR "https://bitbucket.org/rdxzv/clang-standalone.git" "20" false
 fi
 
-if [ ! -d "$AK3_DIR" ] || [ ! -d "$TC_DIR" ]; then
-    echo "Error: Required directories are missing. Aborting the build process."
+if [ ! -d "$TC_DIR" ]; then
+    echo "Error: Clang directory missing. Aborting build process."
     exit 1
 fi
 
@@ -113,24 +112,42 @@ if $ENABLE_KSU; then
 else
 	make $DEFCONFIG
 fi
-make -j$(nproc --all) LLVM=1 Image.gz dtb.img dtbo.img 2> >(tee log.txt >&2) || exit $?
+make -j$(nproc --all) LLVM=1 Image.gz-dtb dtb.img dtbo.img 2> >(tee log.txt >&2) || exit $?
 
-kernel="out/arch/arm64/boot/Image.gz"
+kernel="out/arch/arm64/boot/Image.gz-dtb"
 dtb="out/arch/arm64/boot/dtb.img"
 dtbo="out/arch/arm64/boot/dtbo.img"
 
 if [ -f "$kernel" ] && [ -f "$dtb" ] && [ -f "$dtbo" ]; then
-	echo -e "\nKernel compiled successfully! Zipping up...\n"
-	cp -r $AK3_DIR AnyKernel3
-	cp $kernel $dtb $dtbo AnyKernel3
-	cd AnyKernel3
-	git checkout FSociety &> /dev/null
-	zip -r9 "../$ZIPNAME" * -x .git modules\* patch\* ramdisk\* README.md *placeholder
-	cd ..
-	rm -rf AnyKernel3
-	echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
-	echo "Zip: $ZIPNAME"
-else
-	echo -e "\nCompilation failed!"
-	exit 1
+echo -e "\nKernel compiled succesfully! Zipping up...\n"
+if [ -d "$AK3_DIR" ]; then
+cp -r $AK3_DIR AnyKernel3
+elif ! git clone -q https://github.com/ardia-kun/AnyKernel3; then
+echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
+exit 1
 fi
+cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3
+cp out/arch/arm64/boot/dtbo.img AnyKernel3
+cp out/arch/arm64/boot/dtb.img AnyKernel3
+
+rm -f *zip
+cd AnyKernel3
+git checkout main &> /dev/null
+zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder
+fi
+cd ..
+rm -rf AnyKernel3
+rm -rf out/arch/arm64/boot
+echo -e "======================================="
+echo -e "------------Happy Flashing-------------"
+echo -e "======================================="
+echo -e "Completed in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
+echo "Zip: $ZIPNAME"
+echo "Move Zip into Home Directory"
+mv *.zip ${LOCAL_DIR}
+echo "Upload Zip to Pixeldrain"
+curl -T ${LOCAL_DIR}/*.zip -u :5f45f184-64bb-4eaa-be19-4a5f0459db49 https://pixeldrain.com/api/file/
+echo "Remove The Zip File"
+rm -rf ${LOCAL_DIR}/*.zip
+echo "DONE ALL"
+echo -e "======================================="
