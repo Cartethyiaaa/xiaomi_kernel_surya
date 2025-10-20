@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# Compile script for FSociety kernel
+# Compile script for Lucifer kernel
 # Copyright (C) 2020-2021 Adithya R.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="FSociety-surya-$(date '+%Y%m%d-%H%M').zip"
+ZIPNAME="Lucifer-surya-$(date '+%Y%m%d-%H%M').zip"
 TC_DIR="$(pwd)/tc/clang-20"
 AK3_DIR="$(pwd)/android/AnyKernel3"
 DEFCONFIG="surya_defconfig"
@@ -24,14 +24,11 @@ sync_repo() {
 
     if [ -d "$dir" ]; then
         if $update; then
-			# Fetch the latest changes
             git -C "$dir" fetch origin --quiet
 
-            # Compare local and remote commits
             LOCAL_COMMIT=$(git -C "$dir" rev-parse HEAD)
             REMOTE_COMMIT=$(git -C "$dir" rev-parse "origin/$branch")
 
-            # If there are changes, reset and log the update
             if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
                 git -C "$dir" reset --quiet --hard "origin/$branch"
                 LATEST_COMMIT=$(git -C "$dir" log -1 --oneline)
@@ -41,7 +38,6 @@ sync_repo() {
             fi
         fi
     else
-        # Clone the repository if it doesn't exist
         echo "Cloning $repo_url to $dir..."
         if ! git clone --quiet --depth=1 -b "$branch" "$repo_url" "$dir"; then
             echo "Cloning failed! Aborting..."
@@ -88,7 +84,7 @@ for arg in "$@"; do
 			;;
 		-s|--su)
 			ENABLE_KSU=true
-			ZIPNAME="${ZIPNAME/FSociety-surya/FSociety-KSU}"
+			ZIPNAME="${ZIPNAME/Lucifer-surya/Lucifer-KSU}"
 			;;
 		*)
 			echo "Unknown argument: $arg"
