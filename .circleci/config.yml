@@ -22,7 +22,9 @@ jobs:
 
       - run:
           name: Run build script
-          command: source build.sh --su
+          command: export KBUILD_BUILD_USER=Cartethyia
+                      export KBUILD_BUILD_HOST=android-build
+                      source build.sh --su
 
 workflows:
   version: 2

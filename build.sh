@@ -113,7 +113,7 @@ if [ -f "out/arch/arm64/boot/Image.gz" ] && [ -f "out/arch/arm64/boot/dtbo.img" 
 echo -e "\nKernel compiled succesfully! Zipping up...\n"
 if [ -d "$AK3_DIR" ]; then
 cp -r $AK3_DIR AnyKernel3
-elif ! git clone -q https://github.com/rd-stuffs/AnyKernel3.git; then
+elif ! git clone -q https://github.com/Cartethyiaaa/AnyKernel3.git; then
 echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
 exit 1
 fi
@@ -123,7 +123,7 @@ cp out/arch/arm64/boot/dtb.img AnyKernel3
 
 rm -f *zip
 cd AnyKernel3
-git checkout FSociety &> /dev/null
+git checkout Lucifer &> /dev/null
 zip -r9 "../$ZIPNAME" * -x .git modules\* patch\* ramdisk\* README.md *placeholder
 fi
 cd ..
@@ -137,6 +137,5 @@ echo "Zip: $ZIPNAME"
 echo "Move Zip into Home Directory"
 echo "Upload Zip to Pixeldrain"
 curl -T ${LOCAL_DIR}/*.zip -u :bb2513da-caec-4d8c-9b95-84f05c8dd743 https://pixeldrain.com/api/file/
-echo "Remove The Zip File"
 echo "DONE ALL"
 echo -e "======================================="
