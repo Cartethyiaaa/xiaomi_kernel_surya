@@ -128,7 +128,6 @@ zip -r9 "../$ZIPNAME" * -x .git modules\* patch\* ramdisk\* README.md *placehold
 fi
 cd ..
 rm -rf AnyKernel3
-rm -rf out/arch/arm64/boot
 echo -e "======================================="
 echo -e "------------Happy Flashing-------------"
 echo -e "======================================="
