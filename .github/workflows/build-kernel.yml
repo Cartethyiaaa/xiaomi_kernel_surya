@@ -14,11 +14,11 @@ jobs:
       - name: Setup timezone
         uses: szenius/set-timezone@master
         with:
-          timezoneLinux: "America/Sao_Paulo"
+          timezoneLinux: "Asia/Jakarta"
 
       - name: Run KSU
         run: |
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
+          curl -LSs "https://raw.githubusercontent.com/Cartethyiaaa/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
 
       - name: Run standard build script
         run: |
@@ -33,16 +33,3 @@ jobs:
           export KBUILD_BUILD_HOST=android-build
           source build.sh --su
           echo "ZIPNAME_KSU=${ZIPNAME}" >> $GITHUB_ENV
-
-      - name: Upload standard artifact
-        uses: actions/upload-artifact@main
-        with:
-          name: standard-artifact
-          path: ${{ env.ZIPNAME }}
-
-      - name: Upload KSU artifact
-        uses: actions/upload-artifact@main
-        with:
-          name: KSU-artifact
-          path: ${{ env.ZIPNAME_KSU }}
-
