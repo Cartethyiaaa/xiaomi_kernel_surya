@@ -107,7 +107,7 @@ if $ENABLE_KSU; then
 else
 	make $DEFCONFIG
 fi
-make -j$(nproc --all) LLVM=1 Image.gz dtb.img dtbo.img 2> >(tee log.txt >&2) || exit $?
+make -j$(nproc --all) LLVM=1 KBUILD_BUILD_USER=Cartethyia KBUILD_BUILD_HOST=android-build Image.gz dtb.img dtbo.img 2> >(tee log.txt >&2) || exit $?
 
 if [ -f "out/arch/arm64/boot/Image.gz" ] && [ -f "out/arch/arm64/boot/dtbo.img" ]; then
 echo -e "\nKernel compiled succesfully! Zipping up...\n"

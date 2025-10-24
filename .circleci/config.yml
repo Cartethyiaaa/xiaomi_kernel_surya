@@ -18,15 +18,7 @@ jobs:
 
       - run:
           name: KSU
-          command: curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
-
-      - run:
-          name: USER
-          command: export KBUILD_BUILD_USER=Cartethyia
-
-      - run:
-          name: HOST
-          command: export KBUILD_BUILD_HOST=android-build
+          command: curl -LSs "https://raw.githubusercontent.com/Cartethyiaaa/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
 
       - run:
           name: Build
