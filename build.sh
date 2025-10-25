@@ -4,7 +4,7 @@
 # Mahirooo | HiraTeam.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="Lucifer-surya-$(date '+%Y%m%d-%H%M').zip"
+ZIPNAME="Antares-surya-$(date '+%Y%m%d-%H%M').zip"
 LOCAL_DIR="$(pwd)"
 TC_DIR="$(pwd)/tc/clang-20"
 AK3_DIR="$(pwd)/android/AnyKernel3"
